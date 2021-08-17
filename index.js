@@ -8,6 +8,27 @@ console.log(`serve folder: ${imageDir}`);
 
 const port = 5555;
 const imageSuffixes = ['jpg', 'jpeg', 'webp', 'png', 'gif', 'bmp'];
+const videoSuffixes = ['mp4', 'webm', 'ts', 'wmv', 'mkv', 'avi', 'mts'];
+
+function isKindOf(name, suffixes) {
+    const _filename = name.endsWith('/') ? name.substring(0, e.length - 2) : name;
+    for (const suffix of suffixes) {
+        if (_filename.endsWith(suffix) || _filename.endsWith(suffix.toUpperCase())) {
+            return true;
+        }
+    }
+    return false;
+}
+
+const isImage = (name) => isKindOf(name, imageSuffixes);
+
+const isVideo = (name) => isKindOf(name, videoSuffixes);
+
+app.get('/v/:vid', function (req, res) {
+    const reqPath = decodeURIComponent(req.path);
+    const absolutePath = path.join(imageDir, reqPath);
+    res.send(`<video src='/${req.params.vid}' controls autoplay='true'></video>`);
+});
 
 app.get('*', function (req, res) {
     const reqPath = decodeURIComponent(req.path);
@@ -29,17 +50,10 @@ app.get('*', function (req, res) {
             if (stat.isDirectory()) {
                 content.push(`<p><a href='${filePath}'>${filePath}</a></p>`);
                 return;
+            } else if (isImage(e)) {
+                content.push(`<img src='${filePath}' style="width:100%;"/>`);
             } else {
-                const filename = e.endsWith('/') ? e.substring(0, e.length - 2) : e;
-                for (const suffix of imageSuffixes) {
-                    if (filename.endsWith(suffix) || filename.endsWith(suffix.toUpperCase())) {
-                        content.push(`<img src='${filePath}' style="width:100%;"/>`);
-                        return;
-                    }
-                }
-                // it's not a image
-                content.push(`<p><a href='${filePath}'>${filePath}</a></p>`);
-                return;
+                content.push(`<p><a href='${isVideo(filePath) && 'v'}${filePath}'>${filePath}</a></p>`);
             }
         });
 
@@ -48,7 +62,7 @@ app.get('*', function (req, res) {
             if (a.indexOf(`<a`) != -1) return -1;
             if (b.indexOf(`<a`) != -1) return 1;
             return a.localeCompare(b);
-        })
+        });
 
         res.send(pre + _content.join('') + suf);
     }
