@@ -24,10 +24,9 @@ const isImage = (name) => isKindOf(name, imageSuffixes);
 
 const isVideo = (name) => isKindOf(name, videoSuffixes);
 
-app.get('/v/:vid', function (req, res) {
+app.get(/^\/v\/(.+)/, function (req, res) {
     const reqPath = decodeURIComponent(req.path);
-    const absolutePath = path.join(imageDir, reqPath);
-    res.send(`<video src='/${req.params.vid}' controls autoplay='true'></video>`);
+    res.send(`<video src='/${reqPath.slice(3)}' width='100%' muted controls autoplay></video>`);
 });
 
 app.get('*', function (req, res) {
@@ -48,12 +47,12 @@ app.get('*', function (req, res) {
             const stat = fs.statSync(path.join(absolutePath, e));
             const filePath = (reqPath === '/' ? '' : reqPath) + '/' + e;
             if (stat.isDirectory()) {
-                content.push(`<p><a href='${filePath}'>${filePath}</a></p>`);
+                content.push(`<p><a href='${filePath}'>${filePath.split('/').pop()+'/'}</a></p>`);
                 return;
             } else if (isImage(e)) {
-                content.push(`<img src='${filePath}' style="width:100%;"/>`);
+                content.push(`<img src='${filePath}' style='width:100%;'/>`);
             } else {
-                content.push(`<p><a href='${isVideo(filePath) && 'v'}${filePath}'>${filePath}</a></p>`);
+                content.push(`<p><a href='${isVideo(filePath) && '/v'}${filePath}'>${filePath.split('/').pop()}</a></p>`);
             }
         });
 
