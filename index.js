@@ -47,12 +47,12 @@ app.get('*', function (req, res) {
             const stat = fs.statSync(path.join(absolutePath, e));
             const filePath = (reqPath === '/' ? '' : reqPath) + '/' + e;
             if (stat.isDirectory()) {
-                content.push(`<p><a href='${filePath}'>${filePath.split('/').pop()+'/'}</a></p>`);
+                content.push(`<p><a href='${filePath}'>${filePath.split('/').pop() + '/'}</a></p>`);
                 return;
             } else if (isImage(e)) {
                 content.push(`<img src='${filePath}' style='width:100%;'/>`);
             } else {
-                content.push(`<p><a href='${isVideo(filePath) && '/v'}${filePath}'>${filePath.split('/').pop()}</a></p>`);
+                content.push(`<p><a href='${isVideo(filePath) ? '/v' : ''}${filePath}'>${filePath.split('/').pop()}</a></p>`);
             }
         });
 
