@@ -1,5 +1,5 @@
 # Disk Image Viewer
-一个简单显示磁盘上的图片服务
+一个简单显示磁盘上的图片和视频服务，支持缓存（永久），视频206 Partial Content。
 
 A simple web service that can view images on the disk.
 
@@ -7,20 +7,12 @@ A simple web service that can view images on the disk.
 
 It's similar to `http-server` and `http.server`, but it displays images in place instead of providing a link. So it's convinient to view images on remote vm. 
 
+##### 从nodejs改成Go重写了一下，方便使用
+
 ## Usage
 
 
-- install dependencies
-
-`yarn` or `npm install`
-
-- start server
-
-`npm run serve <image_dir_absolute_path>`
-
-- open browser at 
-
-`localhost:5555`
+`go run main.go <image_dir_absolute_path>`
 
 
 ## Screenshot
