@@ -143,7 +143,7 @@ func handle(w http.ResponseWriter, r *http.Request) {
 
 			a, b := content[i], content[j]
 			ac, bc := strings.Contains(a, link), strings.Contains(b, link)
-			if ac && bc {
+			if ac == bc {
 				return strings.Compare(a, b) < 0
 			}
 			if ac {
@@ -152,7 +152,8 @@ func handle(w http.ResponseWriter, r *http.Request) {
 			if bc {
 				return false
 			}
-			return strings.Compare(a, b) < 0
+			// dead code
+			return true
 		})
 
 		_, err = io.WriteString(w, render(strings.Join(content, "")))
