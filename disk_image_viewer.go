@@ -1,6 +1,7 @@
 package main
 
 import (
+	_ "embed"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -14,14 +15,20 @@ import (
 	"strings"
 )
 
+// Todo:
+// 1. image lazy download
+// 2. github action
+// 3. use go tpl
+
 const (
-	magicV = "magic_v"
-	pre    = `<html><style>img{width:100%;}</style><body>`
-	suf    = `</body></html>`
+	addr    = ":18989"
+	magicV  = "magic_v"
+	tplMark = "#CONTENT#"
 )
 
 var (
-	addr          = ":8989"
+	//go:embed template.html
+	tpl           string
 	imageDir      = ""
 	imageSuffixes = []string{"jpg", "jpeg", "webp", "png", "gif", "bmp"}
 	videoSuffixes = []string{"mp4", "webm", "ts", "wmv", "mkv", "avi", "mts"}
@@ -39,15 +46,14 @@ func main() {
 
 		switch {
 		case v.MatchString(p):
-			_, _ = w.Write([]byte(pre + fmt.Sprintf(`<video src="/%s" width="100%%" controls></video>`, p[len(magicV)+2:]) + suf))
+			_, _ = w.Write([]byte(render(fmt.Sprintf(`<video src="/%s" width="100%%" controls></video>`, p[len(magicV)+2:]))))
 		default:
 			handle(w, r)
 		}
-
 	})
 
 	_, _ = io.WriteString(os.Stdout, fmt.Sprintf("Start listening at: %s\n", addr))
-	_ = http.ListenAndServe(addr, nil)
+	log.Fatal(http.ListenAndServe(addr, nil))
 }
 
 func isKindOf(name string, suffixes []string) bool {
@@ -149,9 +155,13 @@ func handle(w http.ResponseWriter, r *http.Request) {
 			return strings.Compare(a, b) < 0
 		})
 
-		_, err = io.WriteString(w, pre+strings.Join(content, "")+suf)
+		_, err = io.WriteString(w, render(strings.Join(content, "")))
 		checkErr(err, w)
 	}
+}
+
+func render(content string) string {
+	return strings.Replace(tpl, tplMark, content, 1)
 }
 
 func checkErr(err error, w http.ResponseWriter) {
