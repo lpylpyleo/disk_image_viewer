@@ -133,11 +133,17 @@ func handle(w http.ResponseWriter, r *http.Request) {
 		}
 
 		sort.Slice(content, func(i, j int) bool {
+			const link = "<a"
+
 			a, b := content[i], content[j]
-			if strings.Contains(a, `<a`) {
+			ac, bc := strings.Contains(a, link), strings.Contains(b, link)
+			if ac && bc {
+				return strings.Compare(a, b) < 0
+			}
+			if ac {
 				return true
 			}
-			if strings.Contains(b, `<a`) {
+			if bc {
 				return false
 			}
 			return strings.Compare(a, b) < 0
