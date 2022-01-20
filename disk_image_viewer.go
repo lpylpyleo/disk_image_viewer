@@ -88,7 +88,7 @@ func handle(w http.ResponseWriter, r *http.Request) {
 	if info.Mode().IsRegular() {
 		checkErr(err, w)
 		// w.Header().Set("Content-Encoding", "gzip")
-		w.Header().Add("Cache-Control", "public, max-age=31536000")
+		w.Header().Add("Cache-Control", "public, max-age=31536000, immutable")
 		w.Header().Add("Last-Modified", http.TimeFormat)
 
 		if match := r.Header.Get("If-None-Match"); match != "" {
@@ -132,7 +132,7 @@ func handle(w http.ResponseWriter, r *http.Request) {
 			if e.IsDir() {
 				content = append(content, fmt.Sprintf(`<p><a href="%s">%s</a></p>`, url.PathEscape(filePath), e.Name()))
 			} else if isImage(filePath) {
-				content = append(content, fmt.Sprintf(`<img src="/%s"/>`, url.PathEscape(filePath[1:])))
+				content = append(content, fmt.Sprintf(`<img data-src="/%s"/>`, url.PathEscape(filePath[1:])))
 			} else if isVideo(filePath) {
 				content = append(content, fmt.Sprintf(`<p><a href="/%s/%s">%s</a></p>`, magicV, url.PathEscape(filePath[1:]), e.Name()))
 			}

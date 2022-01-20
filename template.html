@@ -15,6 +15,35 @@
 
 <body>
     #CONTENT#
+
+    <script>
+
+    const width = window.innerWidth
+
+    const observer = new IntersectionObserver(function (entries) {
+        entries.forEach(function (e) {
+            const target = e.target
+            if (e.intersectionRatio > 0 && !target.src) {
+                target.src = target.dataset.src
+                const poll = setInterval(function () {
+                    if (target.naturalWidth) {
+                        clearInterval(poll);
+                        target.width = width
+                        target.height = width * target.naturalHeight / target.naturalWidth
+                    }
+                }, 100);
+            }
+        })
+    });
+
+    document.querySelectorAll('img').forEach(function (e) {
+        e.width = width
+        e.height = width
+        e.style.display = 'block'
+        observer.observe(e);
+    })
+
+</script>
 </body>
 
 </html>
