@@ -1,4 +1,4 @@
-package disk_image_viewer 
+package main
 
 import (
 	_ "embed"
