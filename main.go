@@ -39,10 +39,10 @@ func main() {
 		log.Fatal("Expect an absolute picture path.")
 	}
 	imageDir = os.Args[1]
+	v := regexp.MustCompile(fmt.Sprintf(`^/%s/.*$`, magicV))
 
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		p := r.URL.Path
-		v := regexp.MustCompile(fmt.Sprintf(`^/%s/.*$`, magicV))
 
 		switch {
 		case v.MatchString(p):
@@ -77,6 +77,9 @@ var isVideo = func(name string) bool { return isKindOf(name, videoSuffixes) }
 
 func handle(w http.ResponseWriter, r *http.Request) {
 	reqPath := r.URL.Path
+	if strings.HasPrefix(reqPath, "/") {
+		reqPath = reqPath[1:]
+	}
 
 	absolutePath := path.Join(imageDir, reqPath)
 
@@ -123,18 +126,14 @@ func handle(w http.ResponseWriter, r *http.Request) {
 
 			var filePath = reqPath
 
-			if reqPath == "/" {
-				filePath = ""
-			}
-
-			filePath = filePath + "/" + e.Name()
+			filePath = url.PathEscape(filePath + "/" + e.Name())
 
 			if e.IsDir() {
-				content = append(content, fmt.Sprintf(`<p><a href="%s">%s</a></p>`, url.PathEscape(filePath), e.Name()))
+				content = append(content, fmt.Sprintf(`<p><a href="%s">%s</a></p>`, filePath, e.Name()))
 			} else if isImage(filePath) {
-				content = append(content, fmt.Sprintf(`<img data-src="/%s"/>`, url.PathEscape(filePath[1:])))
+				content = append(content, fmt.Sprintf(`<img data-src="/%s"/>`, filePath))
 			} else if isVideo(filePath) {
-				content = append(content, fmt.Sprintf(`<p><a href="/%s/%s">%s</a></p>`, magicV, url.PathEscape(filePath[1:]), e.Name()))
+				content = append(content, fmt.Sprintf(`<p><a href="/%s/%s">%s</a></p>`, magicV, filePath, e.Name()))
 			}
 		}
 
