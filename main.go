@@ -30,7 +30,7 @@ var (
 	//go:embed template.html
 	tpl           string
 	imageDir      = ""
-	imageSuffixes = []string{"jpg", "jpeg", "webp", "png", "gif", "bmp"}
+	imageSuffixes = []string{"jpg", "jpeg", "webp", "png", "gif", "bmp", "avif"}
 	videoSuffixes = []string{"mp4", "webm", "ts", "wmv", "mkv", "avi", "mts"}
 )
 
